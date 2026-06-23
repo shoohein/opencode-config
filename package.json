@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "@opencode-ai/plugin": "1.17.9"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
+    "prettier": "^3.8.4"
+  },
+  "scripts": {
+    "format": "prettier --write \"**/*.{json,jsonc,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{json,jsonc,md,yml,yaml}\"",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{json,jsonc,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  }
+}
