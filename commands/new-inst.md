@@ -1,9 +1,9 @@
 ---
-description: Add a new instruction to AGENTS.md
+description: 新しい指示をAGENTS.mdに追加する
 ---
 
 $ARGUMENTS
 
 ---
 
-Appends the above to `AGENTS.md` in the workspace root.
+上記をワークスペースルートの `AGENTS.md` に追記する。

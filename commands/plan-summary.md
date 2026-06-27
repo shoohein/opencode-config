@@ -1,12 +1,12 @@
 ---
-description: Summarize current plan and decision items
+description: 現在の計画と決定事項を要約する
 ---
 
-Refer to the TODO list managed by the `todowrite` tool.
+`todowrite` ツールで管理されている TODO リストを参照する。
 
-Summarize the current state:
+現在の状態を要約する:
 
-- **Plan being executed**: What is currently in progress, what has been completed, and what is pending.
-- **Items to decide**: What items are waiting for the user's decision or input.
+- **実行中の計画**: 現在進行中、完了済み、保留中の項目は何か
+- **決定待ち項目**: ユーザーの決定や入力を待っている項目は何か
 
-Organize them clearly and concisely.
+これらを明確かつ簡潔に整理する。
