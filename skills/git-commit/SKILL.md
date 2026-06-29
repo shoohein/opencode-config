@@ -13,7 +13,7 @@ metadata:
 - Review local Git changes
 - Split changes into small, atomic commits
 - Choose an appropriate semantic prefix for each commit
-- Create commit messages in this format: `<prefix>: <short summary>`
+- Create commit messages in this format: `<prefix>(<scope>): <short summary>`
 - Allowed prefixes:
   - `feat`: new functionality
   - `fix`: bug fix
@@ -22,6 +22,10 @@ metadata:
   - `test`: tests only
   - `chore`: tooling / build / config (no user-facing change)
   - `ci`: CI configuration / workflow changes
+- Optional scope (area/module affected, e.g. `feat(auth)`):
+  - Use a short, single-word identifier for the component/module changed
+  - Good for `git log --oneline` readability: `feat(auth): add login` vs `feat: add login`
+  - Skip scope when the change is too broad or cross-cutting
 
 ## When to use me
 
