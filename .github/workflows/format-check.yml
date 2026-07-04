@@ -5,15 +5,16 @@ on:
   pull_request:
     branches: [main]
 jobs:
-  prettier:
+  biome:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - run: npm ci
-      - run: npx prettier --check "**/*.{json,jsonc,md,yml,yaml}"
+      - run: npm run format:check
+      - run: npm run lint
   actionlint:
     runs-on: ubuntu-latest
     steps:
