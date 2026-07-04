@@ -15,6 +15,18 @@ jobs:
       - run: npm ci
       - run: npm run format:check
       - run: npm run lint
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update -q && sudo apt-get install -y shellcheck
+      - run: npm run lint:sh
+  shfmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update -q && sudo apt-get install -y shfmt
+      - run: npm run format:sh:check
   actionlint:
     runs-on: ubuntu-latest
     steps:
