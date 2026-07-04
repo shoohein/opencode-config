@@ -3,13 +3,5 @@
   "useTabs": false,
   "printWidth": 100,
   "proseWrap": "never",
-  "trailingComma": "all",
-  "overrides": [
-    {
-      "files": "*.jsonc",
-      "options": {
-        "parser": "json"
-      }
-    }
-  ]
+  "trailingComma": "all"
 }
