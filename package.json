@@ -13,6 +13,8 @@
   "scripts": {
     "format": "biome format --write . && prettier --write \"**/*.{md,yml,yaml}\"",
     "format:check": "biome format . && prettier --check \"**/*.{md,yml,yaml}\"",
+    "format:sh": "git ls-files '*.sh' '.husky/*' 'bin/*' | xargs shfmt -w",
+    "format:sh:check": "git ls-files '*.sh' '.husky/*' 'bin/*' | xargs shfmt -d",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "typecheck": "tsc --noEmit",
