@@ -92,7 +92,7 @@ Show the inferred location to the user and confirm: "I will create the skill at 
 From the user's description, generate:
 
 - **`name`**: Must match regex `^[a-z0-9]+(-[a-z0-9]+)*$`, 1-64 chars, and be **unique** across all locations scanned in Step 1.
-- **`description`**: 1-1024 chars.
+- **`description`**: 1-100 chars (120 max if unavoidable).
   - Unique: avoid repeating another skill's stated purpose or first sentence. Prefer a clearly distinct trigger sentence.
   - Declarative: the agent can decide to invoke this skill without reading the full body.
   - Specific: state what the skill does in one sentence.
