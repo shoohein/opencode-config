@@ -7,7 +7,8 @@
 
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync } from "node:fs";
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { tool } from "@opencode-ai/plugin";
 
 function scriptEnv(tasksDir: string): NodeJS.ProcessEnv {
@@ -40,14 +41,16 @@ function validateTaskPath(tasksDir: string, p: string): string {
   return resolved;
 }
 
+const pluginDir = dirname(fileURLToPath(import.meta.url));
+
 function run(
   ctx: { worktree?: string; directory?: string },
   subcommand: string,
   ...args: string[]
 ): string {
-  const base = ctx.worktree || ctx.directory || ".";
-  const script = resolve(base, "bin/tasks.sh");
-  const tasksDir = resolve(base, "tasks");
+  const projectRoot = ctx.worktree || ctx.directory || ".";
+  const script = resolve(pluginDir, "..", "bin", "tasks.sh");
+  const tasksDir = resolve(projectRoot, "tasks");
   try {
     return execFileSync("/bin/bash", [script, subcommand, ...args], {
       encoding: "utf-8",
