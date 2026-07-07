@@ -11,8 +11,8 @@
     "typescript": "^6.0.3"
   },
   "scripts": {
-    "format:md": "prettier --write \"**/*.md\"",
-    "check:md": "prettier --check \"**/*.md\"",
+    "format:mdyml": "prettier --write \"**/*.{md,yml,yaml}\"",
+    "check:mdyml": "prettier --check \"**/*.{md,yml,yaml}\"",
     "format:ts": "biome format --write .",
     "check:ts": "biome format .",
     "lint:ts": "biome check .",
@@ -27,7 +27,7 @@
     "*.{ts,json,jsonc}": [
       "biome check --write --no-errors-on-unmatched"
     ],
-    "*.md": [
+    "*.{md,yml,yaml}": [
       "prettier --write"
     ],
     "*.sh": [
