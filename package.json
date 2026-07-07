@@ -3,16 +3,27 @@
     "@opencode-ai/plugin": "1.17.9"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.2",
+    "@types/node": "^26.1.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.8",
-    "prettier": "^3.9.4"
+    "prettier": "^3.9.4",
+    "typescript": "^6.0.3"
   },
   "scripts": {
     "format:md": "prettier --write \"**/*.md\"",
     "check:md": "prettier --check \"**/*.md\"",
+    "format:ts": "biome format --write .",
+    "check:ts": "biome format .",
+    "lint:ts": "biome check .",
+    "lint:ts:fix": "biome check --write .",
+    "typecheck": "tsc --noEmit",
     "prepare": "husky"
   },
   "lint-staged": {
+    "*.{ts,json,jsonc}": [
+      "biome check --write --no-errors-on-unmatched"
+    ],
     "*.md": [
       "prettier --write"
     ]
