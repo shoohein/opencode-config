@@ -3,11 +3,14 @@
     "@opencode-ai/plugin": "1.17.9"
   },
   "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
     "prettier": "^3.9.4"
   },
   "scripts": {
     "format:md": "prettier --write \"**/*.md\"",
-    "check:md": "prettier --check \"**/*.md\""
+    "check:md": "prettier --check \"**/*.md\"",
+    "prepare": "husky"
   },
   "lint-staged": {
     "*.md": [
