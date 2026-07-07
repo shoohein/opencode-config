@@ -17,6 +17,9 @@
     "check:ts": "biome format .",
     "lint:ts": "biome check .",
     "lint:ts:fix": "biome check --write .",
+    "format:sh": "git ls-files '*.sh' '.husky/*' 'bin/*' 'scripts/*' | xargs shfmt -w",
+    "check:sh": "git ls-files '*.sh' '.husky/*' 'bin/*' 'scripts/*' | xargs shfmt -d",
+    "lint:sh": "git ls-files '*.sh' '.husky/*' 'bin/*' 'scripts/*' | xargs shellcheck",
     "typecheck": "tsc --noEmit",
     "prepare": "husky"
   },
@@ -26,6 +29,10 @@
     ],
     "*.md": [
       "prettier --write"
+    ],
+    "*.sh": [
+      "shfmt -d",
+      "shellcheck"
     ]
   }
 }
