@@ -42,6 +42,8 @@ Hierarchy clear, scannable in seconds, nesting ≤2 levels
 
 One topic per section, related items adjacent, no unnecessary jumping
 
+- **Abstraction level**: List items share the same abstraction level; no mixing of high-level concepts with implementation details
+
 ## 3. Clarity
 
 Reader-appropriate language, terms defined, no ambiguity
