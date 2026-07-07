@@ -1,5 +1,17 @@
 {
   "dependencies": {
     "@opencode-ai/plugin": "1.17.9"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.4"
+  },
+  "scripts": {
+    "format:md": "prettier --write \"**/*.md\"",
+    "check:md": "prettier --check \"**/*.md\""
+  },
+  "lint-staged": {
+    "*.md": [
+      "prettier --write"
+    ]
   }
 }
