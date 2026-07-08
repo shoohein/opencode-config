@@ -8,7 +8,7 @@ metadata:
   workflow: review
 ---
 
-<!-- This skill intentionally omits Workflow and tool invocation sections — it is a reference-only skill loaded for its Principles. -->
+<!-- This skill intentionally omits Workflow and tool invocation sections — no step-by-step logic or tool orchestration belongs in a shared value document. -->
 
 ## What I do
 
@@ -23,6 +23,7 @@ Load this skill before writing, refactoring, or reviewing code to ground decisio
 - Principles only. No workflow, no tool invocations.
 - Complements agent-specific evaluation criteria; does not replace them.
 - Does not dictate language, framework, or project-specific conventions.
+- When project-specific conventions (ADRs, framework requirements, team agreements) conflict with these principles, the narrower rule takes precedence. This skill provides the default position when no explicit project rule exists.
 
 ## Principles
 
@@ -52,6 +53,12 @@ Load this skill before writing, refactoring, or reviewing code to ground decisio
 
 **Constraint:** Without concrete extension plans, abstraction is YAGNI violation. Postpone abstraction until two or more real variants exist.
 
+#### DRY (Don't Repeat Yourself)
+
+**Value:** The same knowledge (business rules, data structure definitions, constants) must not appear in multiple places. A single change should propagate everywhere through one edit.
+
+**Constraint:** Do not mechanically unify code that merely looks similar (False DRY). The criterion for unification is "does this express the same knowledge" not "do these share a code pattern." When DRY conflicts with KISS/YAGNI, first identify whether the duplication is shared knowledge or coincidental similarity; only unify in the former case.
+
 #### Anti-Overengineering (Design Patterns)
 
 **Value:** Apply design patterns to reduce existing complexity (exploding if/else chains, tangled state).
@@ -64,7 +71,7 @@ Load this skill before writing, refactoring, or reviewing code to ground decisio
 
 **Value:** Detect and surface abnormal states early. Crash (or early-return) immediately to keep the happy path clean and readable.
 
-**Constraint:** Eliminate defensive over-programming — excessive try-catch swallowing errors, cascading null checks that obscure the main flow. Let it fail early, fail visibly.
+**Constraint:** Eliminate defensive over-programming — excessive try-catch swallowing errors, cascading null checks that obscure the main flow. Exception: at public API boundaries, return structured errors to the caller (a crash would take down the entire service needlessly). For transactions and long-running jobs, perform cleanup or rollback before stopping (an abrupt stop leaves corrupt state that makes recovery impossible). For internal invariant violations, prefer crash/early-return.
 
 #### Meaningful Comments (Why, Not What)
 
@@ -76,4 +83,4 @@ Load this skill before writing, refactoring, or reviewing code to ground decisio
 
 **Value:** Remove decay: dead code, commented-out blocks, abandoned TODOs, unused exports. A clean codebase resists further rot.
 
-**Constraint:** Never flag style nits (indentation, naming conventions) that a linter or formatter should catch. Reserve energy for design and logic — the substance.
+**Constraint:** Never flag style nits (indentation, naming conventions) that a linter or formatter should catch. Naming inconsistencies that affect API consistency or documented project conventions are reviewable. Do not opine on domain terminology validity (LLMs easily hallucinate domain knowledge).
