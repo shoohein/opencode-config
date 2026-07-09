@@ -63,7 +63,28 @@ Read each reviewer's output using natural language understanding.
 1. Merge duplicate or overlapping findings from different sources into one entry, preserving which reviewers flagged it.
 2. Sort the unified list in reviewer order: structure, clarity, completeness, grammar.
 
-### Step 4: Analyze each finding
+### Step 4: Scrutinize each finding
+
+Before analyzing and classifying, cross-examine each finding's reasoning for validity. Reviewer agents produce judgments; this step verifies them.
+
+For each finding, evaluate:
+
+- **Evidence sufficiency**: Is the finding supported by specific, observable evidence from the document, or does it read as a general impression? If the finding cites a Q&A chain (from self-questioning reviewers), examine whether the answer actually addresses the question with concrete evidence.
+- **Logical soundness**: Does the stated reasoning lead necessarily to the conclusion? Is there a leap in logic — an intermediate step the reviewer did not justify?
+- **Counter-argument**: Can I construct a reasonable argument that this finding is NOT a problem? If a plausible counter-argument exists and the reviewer did not address it, the finding's reasoning is incomplete.
+- **Severity proportionality**: Is the claimed severity (critical/major/minor) proportional to the evidence? A critical finding based on a minor observation, or vice versa, indicates weak reasoning.
+
+Based on scrutiny, assign a verdict to each finding:
+
+| Scrutiny result | Action |
+| --- | --- |
+| Clear evidence, sound logic, severity matches | Proceed to classification |
+| Weak or missing evidence, leap in reasoning, or severity mismatch | Auto-reject. Reason: "Insufficient evidence — finding lacks concrete support from the document" or "Logical leap — reasoning does not support the conclusion" |
+| Borderline (mixed evidence, or counter-argument exists but not decisive) | Proceed to classification but note the concern in the decision presentation |
+
+**Reasoning**: Reviewer agents are fallible. Without scrutiny, the superagent delegates judgment to reviewers and becomes a passive aggregator. Cross-examination makes the superagent an active participant in quality assurance. The reviewer Q&A chain is the input; the scrutiny verdict is the output.
+
+### Step 5: Analyze each finding
 
 Before classifying, examine each finding against these criteria:
 
@@ -78,9 +99,9 @@ If the target document is an ADR or decision record, evaluate findings against A
 - Findings that recommend removing specification detail (implementation artifacts, procedures, configuration templates) from an ADR → auto-approve. ADRs document decisions and rationale, not resulting specifications.
 - Findings that ask for implementation-level coverage (edge cases, error paths, conditional handling) → auto-reject. ADRs document rationale, not operational completeness.
 
-### Step 5: Classify each finding
+### Step 6: Classify each finding
 
-Based on the analysis in Step 4, assign each finding to one of three categories:
+Based on the analysis in Step 5, assign each finding to one of three categories:
 
 | Classification | Definition |
 | --- | --- |
@@ -95,7 +116,7 @@ Base this decision on the nature of the fix, not on the severity field from the 
 - A finding is flagged by multiple independent reviewers → prefer auto-approve (consensus increases confidence).
 - A finding affects other files (cross-references, shared conventions) → prefer needs decision.
 
-### Step 6: Present results
+### Step 7: Present results
 
 Output examples are in English. Present actual results in the user's language.
 
@@ -149,7 +170,7 @@ For each item, show:
 
 If there are no items needing decision, omit this section.
 
-### Step 7: Collect user decisions
+### Step 8: Collect user decisions
 
 For each `needs decision` item, the user responds:
 
@@ -167,7 +188,7 @@ The user may also respond with a blanket statement (e.g., "accept all", "reject 
 - User disagrees without clear rationale → ask clarifying questions: "Is this because the fix conflicts with another requirement, or do you disagree with the premise of the finding?"
 - Discussion leads to a modified fix → capture the modified version as the approved one.
 
-### Step 8: Output the approved fix plan
+### Step 9: Output the approved fix plan
 
 Combine all auto-approved findings and user-approved findings into a natural-language list:
 
@@ -184,7 +205,7 @@ All findings have been approved. Apply these fixes:
 
 Each entry includes severity, a short description of the finding, and the approved fix. The superagent will apply these fixes one by one using Edit + Read tools directly.
 
-### Step 9: Report
+### Step 10: Report
 
 Show a summary:
 
@@ -196,6 +217,7 @@ Show a summary:
 ## Principles
 
 - **Evaluate findings against document purpose and audience.** Do not accept reviewer findings at face value. Classify each finding based on whether it aligns with the target document's role and intended reader. A finding that ignores the reader's expertise is noise. Provide a brief rationale for every auto-classified finding so the user understands the basis for the decision.
+- **Cross-examine reviewer findings.** Reviewer agents produce judgments; the superagent verifies them. Before classifying, scrutinize each finding's Q&A chain for evidence sufficiency, logical soundness, counter-argument viability, and severity proportionality. Findings with weak evidence or logical leaps are discarded regardless of the reviewer's severity assignment.
 - **LLM judgment, not mechanical rules.** Classification of findings into auto-approve, auto-reject, and needs-decision is done by natural language understanding of the finding's nature, not by severity field.
 - **Human-readable output throughout.** No YAML or JSON tables for findings presentation — readers evaluate output in natural language.
 - **One file per invocation.** Do not loop over multiple files. The superagent calls this skill once per file.
