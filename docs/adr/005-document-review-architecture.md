@@ -11,9 +11,9 @@ tags:
 
 ## コンテキスト
 
-プロジェクトのドキュメント品質を継続的に保証するため、ドキュメントをレビューするエージェント群の設計方針を確立する。対象は LLM が生成するプロジェクト内の全技術文書：`docs/`（ADR, 設計書, 開発ガイド, ユーザーガイド）、`instructions/`、`skills/*/SKILL.md`、`agents/*.md`、`AGENTS.md`、`README.md` 等。
+プロジェクトのドキュメント品質を継続的に保証するため、ドキュメントをレビューするエージェント群の設計方針を確立する。対象は LLM が生成するプロジェクト内の全技術文書: `docs/`（ADR, 設計書, 開発ガイド, ユーザーガイド）、`instructions/`、`skills/*/SKILL.md`、`agents/*.md`、`AGENTS.md`、`README.md` 等。
 
-問題点:
+問題点：
 
 - `documentation-policy.md` が 6 原則（Structured / Cohesive / Clarity / Minimal / Completeness / Consistency）を定義しているが、レビュー主体が存在しない。
 - 単一のレビューエージェントでは 1 パスでの全原則チェックに限界があり、見落としやノイズが増える。
@@ -23,6 +23,7 @@ tags:
 
 - **ADR 001:** スキル設計原則
 - **ADR 002:** エージェント設計 — 本 ADR のエージェント構成は同 ADR の 3 層アーキテクチャ（Role / Input / Output）および Criteria セクション拡張に従う
+- **ADR 004:** 自問形式レビュアーアーキテクチャ — 本 ADR のエージェント Criteria は同 ADR の問い形式に従う
 
 ## 検討した代替案
 
@@ -36,7 +37,7 @@ tags:
 
 ### C: 6 原則の 3 グループ化
 
-`document-structure-reviewer`（Structured + Cohesive）+ `document-clarity-reviewer`（Clarity + Minimal）+ `document-completeness-reviewer`（Completeness + Consistency）。採用 close: 6 原則を相互排他的に分割でき重複が原理的に発生しない。ただし表層レイヤー（誤字脱字・文法）の受け皿がない。
+`document-structure-reviewer`（Structured + Cohesive）+ `document-clarity-reviewer`（Clarity + Minimal）+ `document-completeness-reviewer`（Completeness + Consistency）。採用候補: 6 原則を相互排他的に分割でき重複が原理的に発生しない。ただし表層レイヤー（誤字脱字・文法）の受け皿がない。
 
 ### D: 最小化（1 エージェント）
 
@@ -55,7 +56,7 @@ tags:
   意味   doc-completeness-reviewer（Completeness + Consistency）
   ```
 
-- **代替案:** grammar-reviewer を 1 つに統合し多言語対応させる（没）。言語固有のルール（送り仮名と冠詞、ら抜きと主述一致）が混在すると criteria が肥大化し、レビュー精度が低下する。
+- **代替案:** grammar-reviewer を 1 つに統合し多言語対応させる（没）。言語固有のルール（送り仮名と冠詞の違い、ら抜きと主述一致の違い）が混在すると criteria が肥大化し、レビュー精度が低下する。
 - **理由:** 各レイヤーは完全に直交し、上位レイヤーが下位レイヤーの問題をノイズとして報告しない。grammar → structure → clarity → completeness の順に自然な積み上げとなる。
 
 ### 2. Severity: 3 段階
@@ -82,76 +83,30 @@ tags:
       suggestion: string
   ```
 
-- **理由:** 人間可読性（markdown list ではなくインデント構造による明瞭な分離）と機械パース（review-cycle スキルによる集約）の両立。YAML は JSON より技術文書の読者に馴染み深く、インデントによる視認性が高い。
+- **理由:** 人間可読性（markdown list ではなくインデント構造による明瞭な分離）と LLM による自然言語判断での集約（doc-review-cycle スキルによる）の両立。YAML は JSON より技術文書の読者に馴染み深く、インデントによる視認性が高い。
 
 ### 4. Cross-document consistency の委譲
 
-- **決定:** 文書間の矛盾検出（例: ADR 002 と ADR 003 の記述不一致）は `doc-completeness-reviewer` の責務から外し、後続の `review-cycle` スキルに委譲する。
-- **理由:** 単一エージェントの責務を「1 ファイルの内容から判断できること」に限定する。複数ファイル横断の比較はオーケストレーターの仕事であり、agent が自身の入力範囲を超えた他文書を読み込むと Do one thing well に違反する。
+- **決定:** 文書間の矛盾検出（例: ADR 002 と ADR 003 の記述不一致）は `doc-completeness-reviewer` の責務から外し、別途作成する `cross-doc-check` スキルに委譲する。
+- **理由:** 単一エージェントの責務を「1 ファイルの内容から判断できること」に限定する。複数ファイル横断の比較はオーケストレーターの仕事であり、agent が自身の入力範囲を超えた他文書を読み込むと Do one thing well（Unix philosophy）に違反する。
 
-### 5. 各エージェントの Criteria
+### 5. エージェントと原則のマッピング
 
-#### doc-grammar-jp-reviewer
+各エージェントは `documentation-policy.md` の 6 原則を以下のように担当する。詳細 criteria は各 agent 定義ファイル（`agents/doc-*-reviewer.md`）を authority とする。
 
-| #   | 軸              | 評価内容                                         |
-| --- | --------------- | ------------------------------------------------ |
-| 1   | 表記ゆれ        | 同一文書内での漢字/ひらがな/カタカナ表記の不統一 |
-| 2   | 誤字            | 明らかなタイプミス                               |
-| 3   | 脱字            | 文意を損なう文字の欠落                           |
-| 4   | 句読点          | 読点の過不足、句点欠落、行頭禁則                 |
-| 5   | 送り仮名        | 一般的表記慣習からの逸脱                         |
-| 6   | ら抜き・い抜き  | 口語的活用の混入                                 |
-| 7   | 助詞の誤用      | 不自然な助詞選択                                 |
-| 8   | 敬体/常体の混在 | です・ます調 ↔ だ・である調の混在                |
-
-#### doc-grammar-en-reviewer
-
-| #   | 軸                     | 評価内容                                             |
-| --- | ---------------------- | ---------------------------------------------------- |
-| 1   | Consistent register    | Tone/style shift within same document                |
-| 2   | Spelling errors        | Typo, misspelling, incorrect homophone               |
-| 3   | Missing words          | Word omission breaking sentence comprehension        |
-| 4   | Article usage          | a/an/the misuse, missing/unnecessary article         |
-| 5   | Subject-verb agreement | Number disagreement                                  |
-| 6   | Punctuation            | Comma splice, missing period, run-on sentences       |
-| 7   | Preposition errors     | Wrong or missing preposition                         |
-| 8   | Tense consistency      | Unjustified tense shift within paragraph or document |
-
-#### doc-structure-reviewer
-
-| #   | 軸                        | 評価内容                                                       |
-| --- | ------------------------- | -------------------------------------------------------------- |
-| 1   | Scannability              | 見出しだけで文書構造が把握できるか                             |
-| 2   | Nesting depth             | `####` → major, `#####` → critical。平坦化または文書分割を促す |
-| 3   | Section cohesion          | 1 セクションに複数トピックが混在していないか                   |
-| 4   | Adjacency                 | 関連すべき項目が別セクションに分散していないか                 |
-| 5   | Abstraction level         | 同一リスト内の項目が同じ抽象度か                               |
-| 6   | Missing structure         | 文書種別に対して期待される構造要素の欠落                       |
-| 7   | Cross-reference integrity | 文書内の参照先が実在するか                                     |
-
-#### doc-clarity-reviewer
-
-| #   | 軸              | 評価内容                                                           |
-| --- | --------------- | ------------------------------------------------------------------ |
-| 1   | Ambiguity       | 複数解釈可能な表現、主語不在の曖昧文                               |
-| 2   | Undefined terms | 本文中で定義されていない専門用語・略語                             |
-| 3   | Reader mismatch | 想定読者の前提知識を超える説明飛躍・過剰に基礎的な説明             |
-| 4   | Noise           | 情報価値ゼロの文、判断・事実を伴わない前置き、同一内容の不要な再掲 |
-
-#### doc-completeness-reviewer
-
-| # | 軸 | 評価内容 |
+| Agent | Layer | Principle |
 | --- | --- | --- |
-| 1 | Missing prerequisites | 手順前に必要な前提条件の記載漏れ |
-| 2 | Missing edge cases | 境界条件・例外ケースの未記載 |
-| 3 | Missing error paths | 失敗モード・エラーハンドリングの未記載 |
-| 4 | Internal contradiction | 同一文書内での矛盾 |
-| 5 | Convention drift | プロジェクト規約（命名、ディレクトリ構造、テンプレート）との不一致 |
+| `doc-grammar-jp-reviewer` / `doc-grammar-en-reviewer` | Surface | Language-specific surface checks |
+| `doc-structure-reviewer` | Structure | Structured + Cohesive |
+| `doc-clarity-reviewer` | Expression | Clarity + Minimal |
+| `doc-completeness-reviewer` | Semantic | Completeness + Consistency |
+
+grammar-reviewer は言語固有ルールのため日英 2 agent に分割した。表層 → 構造 → 表現 → 意味の積み上げにより、下位レイヤーの問題が上位レイヤーの判断を汚染しない。
 
 ### 6. Scope: LLM 生成技術文書
 
 - **決定:** 本エージェント群は LLM が生成する技術文書全般を対象とする。対象外の文書種別（エッセイ、プレゼンテーション原稿、一般文書）に適用した場合のレビュー精度は保証しない。対象文書の具体例は `agents/README.md` に列挙する。
-- **理由:** 各 criteria は技術文書の読み手（実装者、設計者）の認知負荷最小化を前提に設計されている。文体の硬さやフィラー排除といった判断基準は技術文書固有のものであり、他の文書種別では適切でない場合がある。
+- **理由:** 各 criteria は技術文書の読み手（実装者、設計者）の認知負荷最小化を前提に設計されている。文体の硬さやフィラー排除（例: 無意味な前置き「なお」「ちなみに」の削除）といった判断基準は技術文書固有のものであり、他の文書種別では適切でない場合がある。
 
 ## 結果
 
@@ -159,25 +114,25 @@ tags:
 
 - 5 エージェントの責務が完全に直交し、レビュー結果の重複とノイズが最小化される
 - 表層→構造→表現→意味の積み上げにより、下位レイヤーの問題が上位レイヤーの判断を汚染しない
-- 共通 YAML envelope により review-cycle スキルでの機械的な集約が可能
+- 共通 YAML envelope により LLM による自然言語判断での集約が可能
 - criteria が `documentation-policy.md` の品質基準と 1:1 対応し、検証可能性が高い
 - `code-*-reviewer` との severity 体系の対称性により、プロジェクト全体で一貫したレビュー基準を維持
 
 ### ネガティブ
 
 - エージェント数が 5 と多く、review-cycle でのオーケストレーション負荷が増加する
-- cross-document consistency が agent スコープ外のため、文書間矛盾の完全な検出は review-cycle の実装品質に依存する
+- cross-document consistency が agent スコープ外のため、文書間矛盾の完全な検出は `cross-doc-check` スキルの実装品質に依存する
 - LLM の推論品質に依存するため、特に grammar-reviewer は非決定的な表記ゆれ判定を出す可能性がある
 
 ## 関連文書
 
-| 文書                                      | 関係                                              |
-| ----------------------------------------- | ------------------------------------------------- |
-| `instructions/documentation-policy.md`    | 本 ADR が参照するドキュメント品質 6 原則          |
-| `docs/adr/002-agent-design-principles.md` | エージェントのファイル構造と 3 層アーキテクチャ   |
-| `agents/doc-grammar-jp-reviewer.md`       | 本 ADR に基づく実装（予定）                       |
-| `agents/doc-grammar-en-reviewer.md`       | 同上                                              |
-| `agents/doc-structure-reviewer.md`        | 同上                                              |
-| `agents/doc-clarity-reviewer.md`          | 同上                                              |
-| `agents/doc-completeness-reviewer.md`     | 同上                                              |
-| `skills/review-cycle/SKILL.md`            | 本 ADR に基づくオーケストレーションスキル（予定） |
+| 文書                                      | 関係                                            |
+| ----------------------------------------- | ----------------------------------------------- |
+| `instructions/documentation-policy.md`    | 本 ADR が参照するドキュメント品質 6 原則        |
+| `docs/adr/002-agent-design-principles.md` | エージェントのファイル構造と 3 層アーキテクチャ |
+| `agents/doc-grammar-jp-reviewer.md`       | 本 ADR に基づく実装                             |
+| `agents/doc-grammar-en-reviewer.md`       | 同上                                            |
+| `agents/doc-structure-reviewer.md`        | 同上                                            |
+| `agents/doc-clarity-reviewer.md`          | 同上                                            |
+| `agents/doc-completeness-reviewer.md`     | 同上                                            |
+| `skills/doc-review-cycle/SKILL.md`        | 本 ADR に基づくオーケストレーションスキル       |
