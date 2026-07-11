@@ -36,7 +36,7 @@ ADR 005 はドキュメントレビュー基盤（doc-_-reviewer）の 4 レイ�
 
 - **決定:** code-reviewer は単一ファイル完結を基本とする。ファイル横断的な設計判断（モジュール境界違反、循環依存、層間結合）は architecture-reviewer の責務とする。
 - **代替案:** code-reviewer を cross-module 対応とする。没 — 評価項目が局所的であるため cross-module まで広げると architecture-reviewer との責務境界が曖昧になり、各レビュアーの「Do one thing well」原則に反する。
-- **理由:** code-reviewer が評価する項目はすべて局所的であり、単一ファイルの読み取りで完結する。cross-file に広げると architecture-reviewer（未作成）との責務境界が曖昧になり、レビュアー間の重複・判断のブレが生じる。また LLM の有限コンテキストウィンドウ内で判断精度を高めるためにも、コンテキストを 1 ファイルに制限する設計が適切である。
+- **理由:** 単一ファイルに制限することで、LLM の有限コンテキストウィンドウ内で判断精度を高めることができる。また評価項目が 1 ファイル内で完結しているため、cross-file にする必然性がない。
 - **トレードオフ:** 単一ファイルを超える設計の問題（例: モジュール間の不適切な依存関係）はこのエージェント群では検出できない。検出には別途 architecture-reviewer の作成が必要となる。
 
 ### 3. テスト実行と検証の分離
@@ -50,7 +50,7 @@ ADR 005 はドキュメントレビュー基盤（doc-_-reviewer）の 4 レイ�
 
 - **機械的計測を独立 reviewer とする（code-complexity-reviewer）:** 判断 1 に含む
 - **code reviewer を cross-module 対応とする:** 判断 2 に含む
-- **code-testing-reviewer にテス実行権限を与える:** 判断 3 に含む
+- **code-testing-reviewer にテスト実行権限を与える:** 判断 3 に含む
 - **code-reviewer を doc-reviewer と区別せず、ADR 005 の 4 レイヤー構成をそのまま適用する:** コードにはドキュメントと異なる制約（機械的計測の不適合、テスト実行の分離）があるため、doc 版の構成をそのまま適用できない。没。
 
 ## 結果
@@ -66,8 +66,7 @@ ADR 005 はドキュメントレビュー基盤（doc-_-reviewer）の 4 レイ�
 
 - 機械的計測の問題は別ツール（linter / formatter）に依存するため、ツール設定が不十分な環境では見落としが発生する
 - cross-file 設計問題を検出するには architecture-reviewer の作成が別途必要
-- code-testing-reviewer のみ Input が「テストファイル + ソースファイル」の 2 パスとなり、他 3 体と形式が異なる
-- code-testing-reviewer の coverage gap 評価はテストコードとプロダクションコードの両方を読む必要があるため、Input の設計が複雑になる
+- code-testing-reviewer のみ Input が「テストファイル + ソースファイル」の 2 パスが必要となり、他 3 体と形式が異なる
 
 ## 関連文書
 
