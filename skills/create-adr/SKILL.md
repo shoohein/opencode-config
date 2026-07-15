@@ -36,6 +36,23 @@ Template discovery respects a priority chain: `<adr-dir>/_template.md` as projec
 
 Front matter errors block creation; missing optional fields and sections warn but allow proceeding. superseded_by references are validated for format, self-reference, and target existence during Step 6.
 
+### ADR atomic unit
+
+- 1 ADR answers 1 question ("X should behave how?").
+- Sub-decisions that follow from the same question may live in the same ADR.
+- If a decision can be superseded independently of another, they answer different questions — split into separate ADRs.
+
+### Abstraction level tags
+
+ADR abstraction levels are distinguished via front-matter `tags`. Use these project-wide:
+
+| Tag | Meaning |
+| --- | --- |
+| `basic-design` | Fundamental architecture decisions, trade-offs between alternatives |
+| `detailed-design` | Implementation-level decisions (trigger mechanism, data format, concurrency model) |
+
+Directory splitting for abstraction levels is not used — ADR files are flat per ADR 000.
+
 ## Workflow
 
 ### Design rules
