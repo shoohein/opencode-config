@@ -25,29 +25,11 @@ tags:
 - **ADR 002:** エージェント設計 — 本 ADR のエージェント構成は同 ADR の 3 層アーキテクチャ（Role / Input / Output）および Criteria セクション拡張に従う
 - **ADR 004:** 自問形式レビュアーアーキテクチャ — 本 ADR のエージェント Criteria は同 ADR の問い形式に従う
 
-## 検討した代替案
-
-### A: 3 軸（準拠性 / 表現品質 / 構成）
-
-`document-style-reviewer` + `document-expression-reviewer` + `document-structure-reviewer`。没理由: style と expression の責務境界が日本語文書において曖昧で、出力の重複が避けられない。
-
-### B: 2 軸 + 内容チェック
-
-`document-language-reviewer`（文法・文体）+ `document-structure-reviewer`（構成・論理）+ `document-content-reviewer`（正確性・矛盾）。没理由: content-reviewer は事実確認が必要なため難易度が高く、設計段階のドキュメントでは判断材料不足でノイズが多くなる。
-
-### C: 6 原則の 3 グループ化
-
-`document-structure-reviewer`（Structured + Cohesive）+ `document-clarity-reviewer`（Clarity + Minimal）+ `document-completeness-reviewer`（Completeness + Consistency）。採用候補: 6 原則を相互排他的に分割でき重複が原理的に発生しない。ただし表層レイヤー（誤字脱字・文法）の受け皿がない。
-
-### D: 最小化（1 エージェント）
-
-`document-reviewer`（6 原則すべてを 1 パスでチェック）。没理由: プロンプトが長大化し 1 パスでの全原則見落としリスクが高い。
-
 ## 判断
 
 ### 1. 4 レイヤー 5 エージェント構成
 
-- **決定:** 代替案 C を採用しつつ、表層レイヤーとして grammar-reviewer を新設。さらに日本語/英語の 2 エージェントに分割し、計 5 エージェント構成とする。
+- **決定:** 6 原則を 3 グループ（構造/表現/意味）に分割した構成をベースとし、表層レイヤーとして grammar-reviewer を新設。さらに日本語/英語の 2 エージェントに分割し、計 5 エージェント構成とする。
 
   ```
   表層   doc-grammar-jp-reviewer / doc-grammar-en-reviewer
@@ -56,8 +38,11 @@ tags:
   意味   doc-completeness-reviewer（Completeness + Consistency）
   ```
 
-- **代替案:** grammar-reviewer を 1 つに統合し多言語対応させる（没）。言語固有のルール（送り仮名と冠詞の違い、ら抜きと主述一致の違い）が混在すると criteria が肥大化し、レビュー精度が低下する。
 - **理由:** 各レイヤーは完全に直交し、上位レイヤーが下位レイヤーの問題をノイズとして報告しない。grammar → structure → clarity → completeness の順に自然な積み上げとなる。
+- **代替案（3 軸）:** style-reviewer + expression-reviewer + structure-reviewer の構成を検討したが、style と expression の責務境界が日本語文書において曖昧で、出力の重複が避けられないため不採用とした。
+- **代替案（2 軸 + 内容チェック）:** language-reviewer（文法・文体）+ structure-reviewer（構成・論理）+ content-reviewer（正確性・矛盾）の構成を検討したが、content-reviewer は事実確認が必要なため難易度が高く、設計段階のドキュメントでは判断材料不足でノイズが多くなるため不採用とした。
+- **代替案（最小化）:** document-reviewer 1 エージェントで全 6 原則をチェックする構成を検討したが、プロンプトが長大化し 1 パスでの全原則見落としリスクが高いため不採用とした。
+- **代替案（grammar 統合）:** grammar-reviewer を 1 つに統合し多言語対応させる案を検討したが、言語固有のルール（送り仮名と冠詞の違い、ら抜きと主述一致の違い）が混在すると criteria が肥大化しレビュー精度が低下するため不採用とした。
 
 ### 2. Severity: 3 段階
 
@@ -92,7 +77,7 @@ tags:
 
 ### 5. エージェントと原則のマッピング
 
-各エージェントは `documentation-policy.md` の 6 原則を以下のように担当する。詳細 criteria は各 agent 定義ファイル（`agents/doc-*-reviewer.md`）を authority とする。
+各エージェントは `documentation-policy.md` の 6 原則を以下のように担当する。詳細 criteria は各 agent 定義ファイル（`agents/doc-*-reviewer.md`）を原本とする。
 
 | Agent | Layer | Principle |
 | --- | --- | --- |
