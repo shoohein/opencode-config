@@ -10,7 +10,7 @@ metadata:
 
 ## What I do
 
-Create a new ADR file from the user's natural language description, auto-assigning the next sequential ID and validating front matter and required sections. The skill generates the ADR using a template (project-specific `_template.md` or a built-in English fallback) that defines required vs optional sections via `<!-- optional: ... -->` markers.
+Create a new ADR file by extracting decisions from the discussion and mapping them to template sections. Auto-assigns the next sequential ID and validates front matter. Uses a template (project-specific `_template.md` or a built-in English fallback) as a section catalog.
 
 ## When to use me
 
@@ -18,23 +18,14 @@ Call this skill when the user says something like "create an ADR for ...", "new 
 
 ## Scope
 
-- Create new ADRs only. Never modify, delete, or renumber existing ones. Reviewing or editing a just-created ADR is part of the creation flow.
+- Create new ADRs only. Existing ADRs are not modified, deleted, or renumbered by this skill.
 - Works with any project that uses standard ADR conventions (NNN-*.md naming, YAML front matter, H2 section structure).
 
 ## Preconditions
 
 - The ADR directory (determined in Step 1) either exists or can be created via `mkdir -p`.
-- The user has write permission to that directory.
 
 ## Conventions
-
-### Template resolution
-
-Template discovery respects a priority chain: `<adr-dir>/_template.md` as project override, built-in English template as fallback.
-
-### Validation policy
-
-Front matter errors block creation; missing optional fields and sections warn but allow proceeding. superseded_by references are validated for format, self-reference, and target existence during Step 6.
 
 ### ADR atomic unit
 
@@ -42,55 +33,47 @@ Front matter errors block creation; missing optional fields and sections warn bu
 - Sub-decisions that follow from the same question may live in the same ADR.
 - If a decision can be superseded independently of another, they answer different questions — split into separate ADRs.
 
-### Abstraction level tags
+### Extraction model
 
-ADR abstraction levels are distinguished via front-matter `tags`. Use these project-wide:
+Extract information from the discussion, then map to template sections. The template is a catalog of available sections, not a form to complete.
 
-| Tag | Meaning |
-| --- | --- |
-| `basic-design` | Fundamental architecture decisions, trade-offs between alternatives |
-| `detailed-design` | Implementation-level decisions (trigger mechanism, data format, concurrency model) |
+1. Extract these information categories from the discussion:
+   - **context**: background, constraints, assumptions
+   - **decisions**: what was chosen and why (rationale)
+   - **alternatives**: options discussed and rejected — per-decision alternatives map to the bullet within the Decision section; broader project-level alternatives map to the "Considered Alternatives" H2 section
+   - **consequences**: predicted positive/negative effects (only if discussed; the template names this section — the skill does not judge the label)
+   - **related**: other ADRs or documents mentioned
 
-Directory splitting for abstraction levels is not used — ADR files are flat per ADR 000.
+2. Map extracted categories to template sections. The template defines available sections and their order.
+
+3. Minimum output: Context, Decision (including Rationale). These sections must have content. If extraction yields insufficient information, ask the user before proceeding.
+
+4. Other sections: output only when the corresponding category was extracted. Empty sections are omitted — no placeholder headings.
+
+5. Source Trace: every claim must be traceable to the discussion. A claim is valid when it was stated by the user, or proposed by the agent and confirmed by the user (explicit or implicit agreement).
+
+6. Within Decision bullets: include each bullet only when content exists or the user stated "none". Bullet labels follow the template language.
+
+### Synthesized items
+
+When a claim is derived from discussion context but lacks explicit user confirmation, include it in the ADR with an HTML comment marker. The comment communicates:
+
+- This item was synthesized from discussion context
+- The user's explicit confirmation has not been obtained
+- Future agents referencing this ADR should confirm the item with the user
+
+Use the same language as the template. Prefix the first line with `<!-- NOTE:` and close with `-->`.
+
+Report the count after creation in Step 8.
 
 ## Workflow
-
-### Design rules
-
-- Each step is a **single action**: scan files, present findings, ask the user, write a file.
-- `description` (front matter): a concise sentence that supplements the skill name. The agent reads this first when deciding whether to invoke the skill. Choose words for information contrast — clearly distinguishing this skill from others — over grammatical flow.
-- `What I do`: supplements the description. Helps the agent confirm that the loaded skill matches the current task by bridging context.
-- `Workflow`: executes What I do. Prioritize ambiguity resolution and exception handling over brevity. Be detailed about edge cases and fallback behavior.
-- Each step uses the two-layer format:
-
-  ```
-  ### Step n: Short action name
-  **Normal flow:**
-  Happy-path instructions only (no conditionals).
-
-  **Exceptions:**
-  - Condition → fallback behavior.
-  ```
-
-- Steps with no exception cases may omit the Exceptions block.
-- Do **not** include JSON schemas or strict data format definitions. Define input/output semantically: "what information flows in, what comes out, and what to do if information is missing (e.g., ask the user)."
-
-### ADR generation rules
-
-- The generated ADR file has two parts: YAML front matter and markdown body.
-- Front matter fields: `status` (required, one of `Proposed`, `Accepted`, `Rejected`, `Deprecated`, `Superseded`), `date` (required, `YYYY-MM-DD`), `tags` (recommended, list of strings), `superseded_by` (required only when `status: Superseded`).
-- The body consists of H2 sections. Sections marked with `<!-- optional: ... -->` in the template are optional; all others are required.
-- The built-in English template mirrors the project template (`_template.md`) in structure, section ordering, and marker convention. All section headers and content use the same language as the chosen template.
-- Use the [Built-in template](#built-in-template) below as the authoritative fallback when no `_template.md` exists.
-- Fill in only items with user-provided information. Never fabricate alternatives, trade-offs, or rationale that were not discussed. If the user's input lacks these elements, remove the corresponding bullet point from the section.
-- Preserve all section headings from the template, even when the section has no content. For empty optional sections, keep the heading and `<!-- optional: ... -->` comment. For empty required sections, keep the heading. A consistent structure improves pattern recognition for future ADR operations.
 
 ### Step 1: Discover ADR directory
 
 **Normal flow:**
 
-1. Search all instruction files for ADR directory path declarations. Collect every unique path.
-2. If multiple different paths are found → stop with hard error: "Multiple instruction files specify different ADR directory paths: [`{list}`]. Resolve the conflict in `documentation-policy.md` or `opencode.jsonc` first."
+1. Search for ADR directory path declarations in project configuration and instruction files. Collect every unique path.
+2. If multiple different paths are found → stop with hard error: "Multiple instruction files specify different ADR directory paths: [`{list}`]. Resolve the conflict first."
 3. If exactly one path is found → adopt that as the ADR directory path.
 4. If no instruction file specifies a path, probe convention directories in order: `docs/adr/`, `doc/adr/`, `adr/`. Use the first one that exists.
 5. If none exist, ask the user: "No ADR directory found. Where should ADRs be created?" with the default suggestion `docs/adr/`.
@@ -130,10 +113,10 @@ Use this inventory to:
 
 Look for `_template.md` in the ADR directory discovered in Step 1.
 
-- **Found:** Use it as the authoritative template. Parse it to identify required vs optional sections by scanning for `<!-- optional: ... -->` markers immediately below H2 headings.
+- **Found:** Use it as the authoritative template.
 - **Not found:** Use the built-in English template (see [Built-in template](#built-in-template)).
 
-Report which template is in use: "Template: `<path>` (project override)" or "Template: built-in (English, no `_template.md` found)"
+Report: "Template: `<path>` (project override)" or "Template: built-in (English, no `_template.md` found)"
 
 **Exceptions:**
 
@@ -155,56 +138,85 @@ Report: "Next ID: `NNN`"
 
 - Inventory contained files with unparseable filenames (non-matching patterns in the ADR dir) → warn about the presence of non-ADR files but proceed with the numeric max from valid `NNN-*.md` patterns.
 
-### Step 5: Design the ADR content
+### Step 5: Extract and classify
 
 **Normal flow:**
 
-From the user's natural language description, fill in each section of the template:
+1. Parse the discussion into information categories: context, decisions with rationale, alternatives discussed (per-decision and broader), consequences mentioned, related ADRs/documents.
 
-1. **Title:** Derive a short, descriptive title from the user's request. Combine with the ID from Step 4 to form the file slug: `NNN-slug.md`. **Slug generation:** Generate the slug in English. For English body: lowercase the title, replace spaces and special characters with hyphens (kebab-case). For Japanese body: LLM-translate the title to English first, then apply kebab-case. Example: `新しいデータベースを採用する` → `adopt-new-database`.
-2. **Front matter:** Set `status: Proposed`, `date: YYYY-MM-DD` (today's date), `tags` from user input (if user didn't specify, leave as `[]` and warn in Step 6).
-3. **Required sections:** Fill from user input. If content for a required section has fewer than two substantive points or lacks specific rationale, ask the user for more detail before proceeding. If the user confirms "leave as-is", preserve the section heading with no body content. Never fabricate alternatives, trade-offs, or rationale that the user did not discuss.
-4. **Optional sections:** Fill if the user provided relevant information. Leave with the `<!-- optional: ... -->` placeholder comment intact if no content.
+2. Identify atomic decisions:
+   - Determine the question each decision answers. Group decisions by question — each group becomes one ADR.
+   - If multiple ADRs are identified, list them and ask: "N ADRs identified: [list]. Create all?"
+   - Proceed per ADR for the remaining steps.
 
-Detect template language by examining the section headings and comments in `_template.md`. If they are in Japanese, generate the ADR body in Japanese. If using the built-in English template or a template with English headings, generate in English.
+3. Generate title and slug. For slug: English-only, kebab-case. For Japanese body: translate title to English first, then kebab-case. Example: `新しいデータベースを採用する` → `adopt-new-database`.
+
+4. Set front matter: `status: Proposed`, `date: YYYY-MM-DD` (today), `tags` from user input or `[]`.
+
+5. Map extracted categories to template sections:
+   - Minimum output: Context, Decision (with Rationale)
+   - Other sections: output only if the corresponding category was extracted
+   - Per-decision alternatives → bullet within Decision; broader alternatives → H2 section
+   - Within Decision: include each bullet only when content exists or the user stated "none"
+   - Mark synthesized items with the comment format from [Synthesized items](#synthesized-items)
+
+6. Source Trace each claim back to the discussion.
+
+Detect template language by examining section headings and comments in `_template.md`. If they are in Japanese, generate the ADR body in Japanese. If using the built-in English template or a template with English headings, generate in English.
 
 **Exceptions:**
 
+- Context, Decision, or Rationale insufficient → ask the user: "What problem or context led to this decision?" / "What was chosen and why?"
 - Slug collision (a file `NNN-slug.md` already exists) → suggest an alternative slug and ask the user to confirm.
-- User provides insufficient detail for a required section → ask clarifying questions:
-  - "What problem or context led to this decision?"
-  - "What alternatives were considered, and why were they rejected?"
-  - "What are the positive and negative consequences of this decision?"
-  - "Does this decision relate to any other ADRs?" Do not fabricate alternatives, trade-offs, or rationale the user did not discuss.
 
-### Step 6: Validate
+### Step 6: Self-review
 
 **Normal flow:**
 
-Validate the generated ADR content before writing:
+Review the draft against evaluation criteria found in the project. Look for document review criteria definitions — commonly these are agent definition files matching `doc-*-reviewer.md` with a `# Criteria` section. Read any that exist and apply findings. On failure, use the fallback criteria below.
 
-**Hard error (blocks creation):**
+**Deletion gates (remove, do not rewrite):**
 
-- `status` missing or not one of `Proposed`, `Accepted`, `Rejected`, `Deprecated`, `Superseded`
-- `date` missing or not in `YYYY-MM-DD` format
+- Source Trace: claim has no basis in the discussion → remove the claim
+- Abstraction: CLI commands, file paths, data formats, API names → remove the line
+- Meta-Rule: self-referential statements about how ADRs should be written → remove the line
+
+**Fallback criteria (apply when no definition files are available):**
+
+- Structure: heading hierarchy, section cohesion, adjacency
+- Clarity: undefined terms, ambiguity, noise
+- Completeness: missing prerequisites, internal contradictions
+- Grammar: typos, orthographic errors, inconsistent style
+
+**Exceptions:**
+
+- No review criteria definition files are found → apply fallback criteria.
+- A loaded definition introduces criteria that conflict with the deletion gates → deletion gates take precedence.
+
+### Step 7: Validate
+
+**Normal flow:**
+
+Validate the ADR front matter before writing.
+
+Fix automatically where resolution is unambiguous:
+
+- `status` missing → set to `Proposed`
+- `date` missing or unparseable → set to today's date in `YYYY-MM-DD` format
+- `tags` missing → set to `[]`
+
+Hard error (blocks creation, requires user input):
+
 - YAML syntax error in front matter
+- `status` value not one of `Proposed`, `Accepted`, `Rejected`, `Deprecated`, `Superseded`
 - `status: Superseded` but `superseded_by` missing
 - `superseded_by` references an invalid filename format (not `NNN-slug.md`)
 - `superseded_by` references the same ADR (self-reference)
 - `superseded_by` references an ADR that does not exist in the project
 
-**Warning (allows creation after user confirmation):**
+Present hard errors to the user and stop. Note auto-fixes in the final report.
 
-- `tags` missing or empty
-- Required H2 section missing — a section is required when its heading in the template does not include the `<!-- optional: ... -->` comment
-
-Present all errors and warnings to the user. On hard error → stop and ask the user to fix. On warning → show warnings and ask "Proceed anyway?" If the user declines, return to Step 5 for revision or stop without writing.
-
-**Exceptions:**
-
-- Template parsing failed to identify section markers → treat all sections as required. Warn the user that automatic section validation was skipped.
-
-### Step 7: Create file and report
+### Step 8: Create file and report
 
 **Normal flow:**
 
@@ -217,7 +229,8 @@ Print a summary:
 - **Status:** `Proposed`
 - **Location:** `<adr-dir>/NNN-slug.md`
 - **Template used:** `<source>`
-- **Sections:** required `<N>/<M>` filled, optional `<O>/<P>` filled
+- **Self-review:** `N` items removed, `M` items corrected
+- **Synthesized:** `N` items marked for review in the ADR
 
 Ask the user if they want to review or edit the file before finishing.
 
@@ -228,7 +241,7 @@ Ask the user if they want to review or edit the file before finishing.
 
 ## Built-in template
 
-The built-in template mirrors the project template (`_template.md`) structure in English. It uses the same `<!-- optional: ... -->` marker convention:
+The built-in template defines the default section structure. It is a generic fallback — project-local conventions belong in `_template.md`.
 
 ```markdown
 ---
@@ -248,22 +261,20 @@ tags:
 
 ## Related ADRs
 
-<!-- optional: List ADRs that this one depends on, supersedes, or relates to. -->
-
-- **ADR NNN:** Description of the relationship
+<!-- List ADRs that this one depends on, supersedes, or relates to. -->
 
 ## Decision
 
 ### 1. Decision Name
 
 - **Decision:** (what was chosen)
-- **Alternatives considered:** (what other options were evaluated and rejected)
 - **Rationale:** (why this choice was made)
+- **Alternatives considered:** (what other options were evaluated and rejected)
 - **Trade-offs:** (positive and negative consequences of the decision)
 
 ## Considered Alternatives
 
-<!-- optional: Describe broader alternatives not covered under individual decisions. -->
+<!-- Describe broader alternatives not covered under individual decisions. -->
 
 ## Consequences
 
@@ -277,8 +288,5 @@ tags:
 
 ## Related Documents
 
-<!-- optional: Links to related documents (design docs, skills, commands, etc.). -->
-
-| Document | Relationship |
-| -------- | ------------ |
+<!-- Links to related documents (design docs, skills, commands, etc.). -->
 ```
