@@ -49,6 +49,8 @@ Always run these three:
 
 Add the grammar reviewer determined in Step 1 (or none).
 
+If the target file is an ADR (path starts with `docs/adr/`), add `adr-scope-reviewer`.
+
 **Invocation pattern:** Call each reviewer subagent with the file path as input. All reviewers run concurrently.
 
 **Exceptions:**
