@@ -23,13 +23,14 @@ Output ONLY the YAML block with no introductory or closing text. Emit nothing wh
 ```yaml
 findings:
   - location: string
-    question: string      # Question that led to this finding
-    answer: string        # Answer based on document evidence
+    question: string # Question that led to this finding
+    answer: string # Answer based on document evidence
     severity: critical | major | minor
     suggestion: string
 ```
 
 Severity guidelines for clarity review:
+
 - critical — reader cannot reliably understand what the document means (e.g., a term like "idempotent" used throughout without definition, making the entire document incomprehensible)
 - major — reader must re-read to resolve ambiguity or deduce missing definitions (e.g., vague phrasing, undefined term)
 - minor — local clarity slip, does not affect overall comprehension (e.g., one-off noise sentence)
@@ -43,8 +44,10 @@ Severity guidelines for clarity review:
 
 ### Undefined Terms
 
-- Is this term or abbreviation defined before its first use, or does the reader need external knowledge to understand it?
+- Is this term, abbreviation, or abstract concept defined before its first use, or does the reader need external knowledge to understand it?
 - Is an already-defined term redefined unnecessarily, creating redundancy?
+- If the term is an abstract concept or metaphor used as a rationale for a decision, does the document define it concretely enough that a reader can verify the reasoning?
+- If a term is defined only through a parenthetical synonym (e.g., "aesthetics (qualitative code evaluation)"), does the synonym add operational meaning, or does it merely rename the abstraction? Prefer suggesting plain-language replacement over adding parenthetical definitions.
 
 ### Reader Mismatch
 
