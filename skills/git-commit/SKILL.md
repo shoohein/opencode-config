@@ -48,7 +48,7 @@ Run these commands in parallel to understand the current state:
 - `git status` — full working tree status
 - `git diff` — unstaged changes
 - `git diff --staged` — staged changes
-- `git log --oneline -10` — recent commit history
+- `git log --oneline -50` — recent commit history
 
 Use the combined output to assess what needs to be committed.
 
@@ -102,11 +102,31 @@ Commit message format:
 
 - No prefix from the allowed list accurately describes the change → ask the user to choose or suggest one
 
-### Step 4: Present commit plan (conditional)
+### Step 4: Self-check commit plan
 
 **Normal flow:**
 
-If 3 or more commits are planned, present the plan to the user:
+For each planned commit, try to disprove the current message before accepting it. A "looks fine" answer is not enough. If a concrete counterexample exists in the diff, commit history, or changed paths, revise the plan before proceeding.
+
+Ask these four questions for each commit:
+
+1. **Prefix**: What is the strongest argument against this prefix? Check changed files and diff — if another prefix fits better, change it. Pay special attention to documentation-only, tests-only, CI-only, and config/tooling-only changes that might be misclassified as `feat` or `chore`.
+
+2. **Atomicity**: Is this a single logical change? If there are multiple independent reasons to change, split them. Rename + reference update and other inseparable changes may stay as one commit.
+
+3. **Scope**: Examine `git log --oneline -50` (already fetched in Step 1) and the changed paths. Does this scope match the existing granularity? If an existing scope can describe the change, do not create a new one. If the change is cross-cutting and a single scope would be misleading, omit scope.
+
+4. **Summary**: Would a reader's prediction of the diff from this subject line be significantly wrong? Does the summary contain specific keywords for `git log --grep` discovery? If it uses only generic terms, rewrite it.
+
+**Exceptions:**
+
+- Self-check reveals a problem → revise the plan immediately. After revision, re-run the self-check on the affected commit(s).
+
+### Step 5: Present commit plan (conditional)
+
+**Normal flow:**
+
+If 3 or more commits are planned, or if the self-check in Step 4 modified the plan, present the plan to the user:
 
 > Planned commits (3):
 >
@@ -118,9 +138,9 @@ The user's request to commit implies approval of the plan, so proceed without wa
 
 **Exceptions:**
 
-- Fewer than 3 commits planned → skip presentation, proceed directly to Step 5
+- Fewer than 3 commits planned and plan was not modified by self-check → skip presentation, proceed directly to Step 6
 
-### Step 5: Execute commits sequentially
+### Step 6: Execute commits sequentially
 
 **Normal flow:**
 
@@ -142,7 +162,7 @@ For each atomic group:
 
 Before each commit, verify the staged diff is non-empty with `git diff --staged --stat`. If empty, revise the plan rather than running `git commit`.
 
-### Step 6: Report completion
+### Step 7: Report completion
 
 **Normal flow:**
 
