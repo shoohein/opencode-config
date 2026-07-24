@@ -10,7 +10,7 @@ metadata:
 
 ## What I do
 
-Guide the user through a structured requirements clarification process that produces a concrete implementation plan — not vague intent — through iterative questioning, counter-argument, and optional expert consultation.
+Guide the user through a structured requirements clarification process that produces a concrete implementation plan through iterative questioning, counter-argument, and optional expert consultation.
 
 ## When to use me
 
@@ -29,7 +29,7 @@ I manage the discussion workflow and the evolving plan. I do NOT create files, d
 
 - The project root is determinable
 - The `theorist` and `pragmatist` sub-agents are defined and available
-- The calling agent has permission to invoke `Task` for sub-agents
+- The calling agent has permission to invoke the `Task` tool (OpenCode's built-in mechanism for invoking sub-agents)
 
 ## Internal structure: Plan Frame
 
@@ -47,7 +47,7 @@ plan frame:
   answer:      ready / not_ready
 ```
 
-Constraint: Do NOT set answer to ready unless every field has substantive, non-trivial content. One-word entries do not satisfy this constraint.
+Constraint: Do NOT set answer to ready unless every field has substantive, non-trivial content. One-word entries do not satisfy this constraint. Each field must contain at least one complete sentence that would be meaningful to a reader unfamiliar with the session.
 
 ## Workflow
 
@@ -57,7 +57,7 @@ Constraint: Do NOT set answer to ready unless every field has substantive, non-t
 
 Read relevant project files and recent git history to ground the discussion:
 
-- The current working tree state
+- Modified and staged files (`git status` output) and the directory structure
 - Files related to the user's goal
 - The user's stated goal
 
@@ -67,6 +67,7 @@ Gather just enough to avoid offering irrelevant suggestions. Do not research ext
 
 - Project has no git history: rely on file structure alone
 - User provides explicit context: prioritize user-provided information over exploration
+- Project root cannot be determined: ask the user to specify the repository root before proceeding
 
 ### Step 2: Identify key questions
 
@@ -117,7 +118,7 @@ Do NOT present the full plan frame to the user during discussion. Use it interna
 
 - User pushes back on your challenge: if their reasoning is sound, accept it and move on. Re-raise only if a genuine contradiction remains.
 - Discussion stalls on a minor point: suggest tabling it and moving forward.
-- User redirects to a different topic: reset the relevant parts of the plan frame and follow.
+- User redirects to a different topic: reset the relevant parts of the plan frame and follow the new topic.
 
 ### Step 5: Expert review
 
@@ -125,10 +126,8 @@ Do NOT present the full plan frame to the user during discussion. Use it interna
 
 When the plan frame's answer is ready:
 
-1. Tell the user: "The plan is taking shape. I recommend consulting theorist and pragmatist for alternative perspectives."
-2. If the user agrees, invoke both in parallel via Task:
-   - `Task("theorist")` with the current plan frame
-   - `Task("pragmatist")` with the current plan frame
+1. Tell the user the plan is ready for expert review and ask whether to proceed with consulting theorist and pragmatist.
+2. If the user agrees, invoke both in parallel using the Task tool, passing the serialized plan frame as the prompt for each.
 3. Present both outputs side by side
 4. Discuss the feedback and update the plan frame
 
@@ -138,6 +137,7 @@ When the plan frame's answer is ready:
 - One sub-agent fails to respond: present the available feedback only, note the failure
 - theorist and pragmatist directly contradict each other: highlight the contradiction to the user, ask which direction to follow
 - Expert feedback reveals major gaps: return to Step 4 for the newly surfaced issues
+- Task tool is unavailable: skip expert review and proceed to Step 6 with a note that expert consultation was not possible
 
 ### Step 6: Present final plan
 
