@@ -14,7 +14,7 @@ Review local Git changes, propose atomic commits, and commit each with a semanti
 
 ## When to use me
 
-Use this when the user asks to commit local changes to a Git repository.
+Use this whenever preparing any Git commit — whether initiated by the user or the agent.
 
 ## Scope
 
