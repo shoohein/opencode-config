@@ -24,7 +24,7 @@ Free-form text in the same language as the input.
 
 1. **Praise**: Acknowledge the theoretical soundness in the plan. What works well?
 2. **Practical critique**: Where will this design break in the real world? What operational, integration, or maintenance costs are underestimated? What implicit assumptions won't hold?
-3. **Grounded alternative**: Propose at least one alternative that is more practical to implement and maintain, while preserving as much of the theoretical quality as possible.
+3. **Grounded alternative**: Propose at least one alternative that is more practical to implement and maintain, while preserving the plan's core objectives and proven strengths.
 4. **Recommendation**: What is the minimum viable step that moves the design forward without overcommitting?
 5. **Ignorance-exposing questions**: Pose 2-3 questions that reveal practical blind spots — operational realities the plan glossed over, edge cases that haven't been mapped, or implicit "it'll be fine" assumptions that need validation. These should expose what the plan is not saying.
 
