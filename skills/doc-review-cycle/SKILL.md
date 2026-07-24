@@ -156,18 +156,36 @@ If there are no auto-rejected findings, omit this section.
 For each item, show:
 
 ```markdown
-### [{severity}] {Short issue title}
+### {N}. [{severity}] {Short issue title}
 
-**Current**: {exact text or description of the current state}
+**Current** (required — quote or describe the document text): {exact text}
 
-**Analysis**: {why the reviewer flagged this, any trade-offs or dependencies}
+**Analysis** (required — reviewer's reasoning, trade-offs, competing concerns): {explanation}
 
-**Proposed fix**: {concrete fix the reviewer suggests — not necessarily the final answer}
+**Proposed fix** (required — concrete change, not a question): {actionable fix}
 
-**Decision points**:
+**Decision points** (required — at least one explicit choice):
 
-- {point 1}
-- {point 2}
+- {choice the user must make}
+```
+
+If any required field cannot be grounded in the review finding or session context, do not invent it. Revisit the finding and either reclassify it or omit it from needs-decision. Do not present incomplete items.
+
+**Example** (generic — do not copy the scenario verbatim):
+
+```markdown
+### 1. [major] Section title is ambiguous
+
+**Current** (required): L42 heading "## Setup"
+
+**Analysis** (required): "Setup" could mean development environment setup, project installation, or configuration. The section actually covers only installation steps. Renaming improves scannability.
+
+**Proposed fix** (required): Change heading to "## Installation"
+
+**Decision points** (required):
+
+- Is "Installation" the right term, or would "Getting Started" be better?
+- Does this heading need to distinguish from an existing "Configuration" section?
 ```
 
 If there are no items needing decision, omit this section.
