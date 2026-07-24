@@ -2,6 +2,7 @@
 name: code-design-reviewer
 description: Reviews code for maintainability and readability
 mode: subagent
+hidden: true
 temperature: 0.1
 permission:
   edit: deny
@@ -28,13 +29,14 @@ List of findings as YAML. Each finding includes the question that surfaced the i
 ```yaml
 findings:
   - location: string
-    question: string      # The question that led to this finding
-    answer: string        # Answer based on code evidence
+    question: string # The question that led to this finding
+    answer: string # Answer based on code evidence
     severity: critical | major | minor
     suggestion: string
 ```
 
 Severity guidelines:
+
 - critical — design flaw that makes the code unmaintainable (e.g., function doing 5 unrelated things with interleaved concerns)
 - major — design issue that increases maintenance cost (e.g., knowledge duplication across functions, tight internal coupling that complicates testing)
 - minor — local improvement opportunity (e.g., overly long name, ceremony that obscures intent)
@@ -44,6 +46,7 @@ No greetings, preambles, or free-form text outside the findings list.
 # Criteria
 
 Before reporting any finding, invoke the relevant question chain:
+
 - Answer each question based on the observed evidence.
 - Emit a finding only when the answers reveal a genuine problem.
 - When evidence is insufficient to answer, do not emit a finding.

@@ -2,6 +2,7 @@
 name: doc-clarity-reviewer
 description: Reviews technical documentation for clarity and minimalism
 mode: subagent
+hidden: true
 temperature: 0.1
 permission:
   edit: deny

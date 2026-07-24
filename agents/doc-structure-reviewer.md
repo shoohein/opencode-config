@@ -2,6 +2,7 @@
 name: doc-structure-reviewer
 description: Reviews technical documentation for structural integrity: heading hierarchy, proximity of related items, and information architecture.
 mode: subagent
+hidden: true
 temperature: 0.1
 permission:
   edit: deny
@@ -23,8 +24,8 @@ List of findings as YAML with Q&A chain. No wrapper text. Emit nothing when no f
 ```yaml
 findings:
   - location: string
-    question: string      # Question that led to this finding
-    answer: string        # Answer based on document evidence
+    question: string # Question that led to this finding
+    answer: string # Answer based on document evidence
     severity: critical | major | minor
     suggestion: string
 ```

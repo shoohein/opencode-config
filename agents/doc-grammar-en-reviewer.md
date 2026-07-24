@@ -2,6 +2,7 @@
 name: doc-grammar-en-reviewer
 description: Reviews technical documentation written in English for spelling, grammar, and punctuation
 mode: subagent
+hidden: true
 temperature: 0.1
 permission:
   edit: deny
@@ -23,8 +24,8 @@ Output ONLY the YAML block with no introductory or closing text. Emit nothing wh
 ```yaml
 findings:
   - location: string
-    question: string      # Question that led to this finding
-    answer: string        # Answer based on document evidence
+    question: string # Question that led to this finding
+    answer: string # Answer based on document evidence
     severity: critical | major | minor
     suggestion: string
 ```

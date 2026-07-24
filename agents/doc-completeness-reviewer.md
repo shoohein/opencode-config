@@ -2,6 +2,7 @@
 name: doc-completeness-reviewer
 description: Reviews technical documentation for completeness and internal consistency
 mode: subagent
+hidden: true
 temperature: 0.1
 permission:
   edit: deny
@@ -23,13 +24,14 @@ Output ONLY the YAML block with no introductory or closing text. Emit nothing wh
 ```yaml
 findings:
   - location: string
-    question: string      # Question that led to this finding
-    answer: string        # Answer based on document evidence
+    question: string # Question that led to this finding
+    answer: string # Answer based on document evidence
     severity: critical | major | minor
     suggestion: string
 ```
 
 Severity guidelines for completeness review:
+
 - critical — a reader following the document will fail or damage their work (e.g., missing prerequisite, unrecoverable error path)
 - major — a significant effort to work around missing information (e.g., missing edge case, internal contradiction)
 - minor — a foreseeable but unlikely gap (e.g., rare edge case not documented)

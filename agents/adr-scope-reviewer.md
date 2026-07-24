@@ -2,6 +2,7 @@
 name: adr-scope-reviewer
 description: Reviews ADRs for scope boundary violations — content that belongs in design docs, user guides, or agent definitions rather than in an architecture decision record
 mode: subagent
+hidden: true
 temperature: 0.1
 permission:
   edit: deny

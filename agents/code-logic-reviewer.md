@@ -2,6 +2,7 @@
 name: code-logic-reviewer
 description: Reviews code for correctness and edge cases
 mode: subagent
+hidden: true
 temperature: 0.1
 permission:
   edit: deny

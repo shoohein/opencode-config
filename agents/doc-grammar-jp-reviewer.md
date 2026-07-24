@@ -2,6 +2,7 @@
 name: doc-grammar-jp-reviewer
 description: Reviews technical documentation written in Japanese for typos, orthography, and grammar
 mode: subagent
+hidden: true
 temperature: 0.1
 permission:
   edit: deny
@@ -23,13 +24,14 @@ Output ONLY the YAML block with no introductory or closing text. Emit nothing wh
 ```yaml
 findings:
   - location: string
-    question: string      # Question that led to this finding
-    answer: string        # Answer based on document evidence
+    question: string # Question that led to this finding
+    answer: string # Answer based on document evidence
     severity: critical | major | minor
     suggestion: string
 ```
 
 Severity guidelines for grammar review:
+
 - critical — grammar error that changes meaning (e.g., missing "ない" in a negation)
 - major — noticeable grammatical issue that slows reading (e.g., particle misuse, unresolved tense inconsistency)
 - minor — trivial surface slip, no comprehension impact (e.g., single orthographic inconsistency)

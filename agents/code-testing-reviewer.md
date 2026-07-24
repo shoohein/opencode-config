@@ -2,6 +2,7 @@
 name: code-testing-reviewer
 description: Reviews test code quality and design
 mode: subagent
+hidden: true
 temperature: 0.1
 permission:
   edit: deny
@@ -28,13 +29,14 @@ List of findings as YAML. Each finding includes the question that surfaced the i
 ```yaml
 findings:
   - location: string
-    question: string      # The question that led to this finding
-    answer: string        # Answer based on code evidence
+    question: string # The question that led to this finding
+    answer: string # Answer based on code evidence
     severity: critical | major | minor
     suggestion: string
 ```
 
 Severity guidelines:
+
 - critical — test that provides false confidence by passing when behavior is broken (e.g., assertion that never executes, test that always passes)
 - major — test quality issue that reduces regression detection (e.g., missing assertions on side effects, excessive mocking that bypasses production logic)
 - minor — test improvement opportunity (e.g., unclear test name, magic values that could be named constants)
@@ -44,6 +46,7 @@ No greetings, preambles, or free-form text outside the findings list.
 # Criteria
 
 Before reporting any finding, invoke the relevant question chain:
+
 - Answer each question against the observed evidence.
 - Emit a finding only when the answers reveal a genuine problem.
 - When evidence is insufficient to answer, do not emit a finding; if the missing evidence concerns a critical or major severity class, the Blind Spot question may capture it.

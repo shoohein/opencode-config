@@ -2,6 +2,7 @@
 name: code-security-reviewer
 description: Reviews code for security vulnerabilities
 mode: subagent
+hidden: true
 temperature: 0.1
 permission:
   edit: deny
@@ -35,6 +36,7 @@ findings:
 ```
 
 Severity guidelines:
+
 - critical — exploitable vulnerability allowing unauthorized access, data exfiltration, or code execution (e.g., SQL injection in a user-facing endpoint)
 - major — security weakness exploitable under specific conditions (e.g., missing authorization check, weak cryptography for session tokens)
 - minor — hardening opportunity not directly exploitable (e.g., verbose error messages revealing stack traces, unpinned dependencies without known CVEs)
