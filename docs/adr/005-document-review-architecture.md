@@ -39,10 +39,18 @@ tags:
   ```
 
 - **理由:** 各レイヤーは完全に直交し、上位レイヤーが下位レイヤーの問題をノイズとして報告しない。grammar → structure → clarity → completeness の順に自然な積み上げとなる。
-- **代替案（3 軸）:** style-reviewer + expression-reviewer + structure-reviewer の構成を検討したが、style と expression の責務境界が日本語文書において曖昧で、出力の重複が避けられないため不採用とした。
-- **代替案（2 軸 + 内容チェック）:** language-reviewer（文法・文体）+ structure-reviewer（構成・論理）+ content-reviewer（正確性・矛盾）の構成を検討したが、content-reviewer は事実確認が必要なため難易度が高く、設計段階のドキュメントでは判断材料不足でノイズが多くなるため不採用とした。
-- **代替案（最小化）:** document-reviewer 1 エージェントで全 6 原則をチェックする構成を検討したが、プロンプトが長大化し 1 パスでの全原則見落としリスクが高いため不採用とした。
-- **代替案（grammar 統合）:** grammar-reviewer を 1 つに統合し多言語対応させる案を検討したが、言語固有のルール（送り仮名と冠詞の違い、ら抜きと主述一致の違い）が混在すると criteria が肥大化しレビュー精度が低下するため不採用とした。
+- **代替案:**
+  - 3 軸構成（style-reviewer + expression-reviewer + structure-reviewer）
+    - **不採用理由:** style と expression の責務境界が日本語文書において曖昧で、出力の重複が避けられないため
+- **代替案:**
+  - 2 軸 + 内容チェック構成（language-reviewer + structure-reviewer + content-reviewer）
+    - **不採用理由:** content-reviewer は事実確認が必要なため難易度が高く、設計段階のドキュメントでは判断材料不足でノイズが多くなるため
+- **代替案:**
+  - 最小化構成（document-reviewer 1 エージェントで全 6 原則をチェック）
+    - **不採用理由:** プロンプトが長大化し 1 パスでの全原則見落としリスクが高いため
+- **代替案:**
+  - grammar 統合構成（grammar-reviewer を 1 つに統合し多言語対応させる）
+    - **不採用理由:** 言語固有のルールが混在すると criteria が肥大化しレビュー精度が低下するため
 
 ### 2. Severity: 3 段階
 
