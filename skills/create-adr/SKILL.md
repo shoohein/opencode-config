@@ -10,7 +10,7 @@ metadata:
 
 ## What I do
 
-Create a new ADR file by extracting decisions from the discussion and mapping them to template sections. Auto-assigns the next sequential ID and validates front matter. Uses a template (project-specific `_template.md` or a built-in English fallback) as a section catalog.
+Create a new ADR file by extracting decisions from the discussion and mapping them to template sections. Auto-assigns the next sequential ID and validates front matter. Uses a template (project-specific `_template.md` or a built-in English fallback) as the list of available sections and their order.
 
 ## When to use me
 
@@ -53,7 +53,7 @@ Extract information from the discussion, then map to template sections. The temp
 
 4. Other sections: output only when the corresponding category was extracted. Empty sections are omitted — no placeholder headings.
 
-5. Source Trace: every claim must be traceable to the discussion. A claim is valid when it was stated by the user, or proposed by the agent and confirmed by the user (explicit or implicit agreement).
+5. Source Trace: every claim must be traceable to the discussion. A claim is valid when it was stated by the user, or proposed by the agent and confirmed by the user (explicit confirmation, or implicit — the user did not object to the proposal).
 
 6. Within Decision bullets: include each bullet only when content exists or the user stated "none". Bullet labels follow the template language.
 
@@ -66,8 +66,6 @@ When a claim is derived from discussion context but lacks explicit user confirma
 - Future agents referencing this ADR should confirm the item with the user
 
 Use the same language as the template. Prefix the first line with `<!-- NOTE:` and close with `-->`.
-
-Report the count after creation in Step 8.
 
 ## Workflow
 
@@ -156,12 +154,7 @@ Report: "Next ID: `NNN`"
 
 4. Set front matter: `status: Proposed`, `date: YYYY-MM-DD` (today), `tags` from user input or `[]`.
 
-5. Map extracted categories to template sections:
-   - Minimum output: Context, Decision (with Rationale)
-   - Other sections: output only if the corresponding category was extracted
-   - Per-decision alternatives → bullet within Decision; broader alternatives → H2 section
-   - Within Decision: include each bullet only when content exists or the user stated "none"
-   - Mark synthesized items with the comment format from [Synthesized items](#synthesized-items)
+5. Map extracted categories to template sections following the rules in [Extraction model](#extraction-model).
 
 6. Source Trace each claim back to the discussion.
 
@@ -176,7 +169,7 @@ Detect template language by examining section headings and comments in `_templat
 
 **Normal flow:**
 
-Review the draft against evaluation criteria found in the project. Look for document review criteria definitions — commonly these are agent definition files matching `doc-*-reviewer.md` with a `# Criteria` section. Read any that exist and apply findings. On failure, use the fallback criteria below.
+Review the draft against evaluation criteria found in the project. Look for document review criteria definitions — for example, agent definition files with a `# Criteria` section. Read any that exist and apply findings. On failure, use the fallback criteria below.
 
 **Deletion gates (remove, do not rewrite):**
 
@@ -233,7 +226,7 @@ Print a summary:
 - **Location:** `<adr-dir>/NNN-slug.md`
 - **Template used:** `<source>`
 - **Self-review:** `N` items removed, `M` items corrected
-- **Synthesized:** `N` items marked for review in the ADR
+- **Synthesized:** `N` items marked for review in the ADR (report the count after creation)
 
 Ask the user if they want to review or edit the file before finishing.
 
