@@ -40,7 +40,10 @@ Extract information from the discussion, then map to template sections. The temp
 1. Extract these information categories from the discussion:
    - **context**: background, constraints, assumptions
    - **decisions**: what was chosen and why (rationale)
-   - **alternatives**: options discussed and rejected — per-decision alternatives map to the bullet within the Decision section; broader project-level alternatives map to the "Considered Alternatives" H2 section
+   - **alternatives**: options discussed and rejected
+     - Per-decision alternatives map to the nested bullet within the Decision section.
+     - Broader project-level alternatives map to the "Considered Alternatives" H2 section.
+     - Every alternative MUST include a rejection reason, separated as a sub-bullet (alternative description → sub-bullet labeled "Rejection reason:"). If no rejection reason was discussed, omit the alternative entirely.
    - **consequences**: predicted positive/negative effects (only if discussed; the template names this section — the skill does not judge the label)
    - **related**: other ADRs or documents mentioned
 
@@ -269,7 +272,11 @@ tags:
 
 - **Decision:** (what was chosen)
 - **Rationale:** (why this choice was made)
-- **Alternatives considered:** (what other options were evaluated and rejected)
+- **Alternatives considered:**
+
+  - (description of the alternative)
+    - **Rejection reason:** (why this option was not chosen)
+
 - **Trade-offs:** (positive and negative consequences of the decision)
 
 ## Considered Alternatives
