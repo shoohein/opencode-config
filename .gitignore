@@ -1,2 +1,6 @@
 node_modules
 bun.lock
+
+# Session management runtime files
+.opencode/.recovery.lock
+.opencode/.recovery-epoch
