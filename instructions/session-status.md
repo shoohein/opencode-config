@@ -1,6 +1,6 @@
 # Session Status Instruction
 
-At session start, determine whether to collect context (git status, git log, task management). The purpose is to give the agent awareness of the current project state before acting.
+At the start of a session, determine whether to collect context. The purpose is to give the agent awareness of the current project state before acting.
 
 ## Default behavior
 
@@ -10,7 +10,7 @@ Collect context.
 
 Force-collect conditions take priority over skip conditions. If a force-collect condition matches, collect context regardless of skip conditions.
 
-### Skip conditions (skip context collection if any of these apply AND no force-collect condition matches)
+### Skip conditions
 
 | Condition                         | Example                            |
 | --------------------------------- | ---------------------------------- |
@@ -30,8 +30,8 @@ Force-collect conditions take priority over skip conditions. If a force-collect 
 
 ## Information to collect
 
-| Source                 | Content                                                  |
-| ---------------------- | -------------------------------------------------------- |
-| `git status`           | Working tree state (modified, staged, untracked files)   |
-| `git log`              | Recent commit history (last 10 commits)                  |
-| Task management system | In-progress task's Next Action, Worklog (skip if absent) |
+| Source                 | Content                                                     |
+| ---------------------- | ----------------------------------------------------------- |
+| `git status`           | Working tree state (modified, staged, untracked files)      |
+| `git log`              | Recent commit history (last 20 commits)                     |
+| Task management system | In-progress task's Next Action and Worklog (skip if absent) |
