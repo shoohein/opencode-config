@@ -1,6 +1,6 @@
 ---
-description: セッションを正常終了する
+description: セッションを終了する
 agent: build
 ---
 
-session-closeスキルをロードして、セッションの正常終了処理を実行してください。
+session-closeスキルをロードして、「$ARGUMENTS」で指定された理由（`completed` または `interrupted`）に応じて、セッションの終了処理を実行してください。
