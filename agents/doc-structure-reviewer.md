@@ -1,6 +1,6 @@
 ---
 name: doc-structure-reviewer
-description: Reviews technical documentation for structural integrity: heading hierarchy, proximity of related items, and information architecture.
+description: Reviews technical documentation for structural integrity
 mode: subagent
 hidden: true
 temperature: 0.1
