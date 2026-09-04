@@ -15,6 +15,7 @@ Review local Git changes, propose atomic commits, and commit each with a semanti
 ## When to use me
 
 Use this whenever preparing any Git commit — whether initiated by the user or the agent.
+Also use this when planning commits without executing them (e.g. proposing split/messages, dry-run).
 
 ## Scope
 
